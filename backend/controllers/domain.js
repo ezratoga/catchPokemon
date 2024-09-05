@@ -9,11 +9,12 @@ const catchPokemon = (req, res) => {
     try {
         const probability = Math.random();
         const success = probability < 0.5;
+        console.log(probability);
         let message = 'failed to catch pokemon';
         if (success) {
-            myPokemon.push(req.body);
+            myPokemon.push(req);
             message = 'congrats! you got the pokemon';
-            return data(success, message, 200);
+            return data(success, message, 200, `probability is ${success}`);
         }
         
         return data(success, message, 400);
@@ -23,6 +24,7 @@ const catchPokemon = (req, res) => {
 };
 
 const releasePokemon = (req, res) => {
+    const { id, nickname } = req.body;
     const primeCheck = Math.floor(Math.random() * 100) + 1;
     const isPrime = (num) => {
         for (let iteration = 2, squareroot = Math.sqrt(num); iteration <= squareroot; iteration++) {
@@ -31,8 +33,10 @@ const releasePokemon = (req, res) => {
         return num > 1;
     };
 
+    const pokemonToDeleted = myPokemon.findIndex((elem) => elem.id === id);
+
     if (isPrime(primeCheck)) {
-        delete caughtPokemons[req.body.nickname];
+        delete myPokemon[pokemonToDeleted];
         res.json({ success: true, primeCheck });
     } else {
         res.json({ success: false, primeCheck });
@@ -40,7 +44,7 @@ const releasePokemon = (req, res) => {
 };
 
 const renamePokemon = (req, res) => {
-    const { oldNickname, newNickname } = req.body;
+    const { id, oldNickname, newNickname } = req.body;
     const fibIndex = fibonacciSequence.length;
 
     caughtPokemons[newNickname] = caughtPokemons[oldNickname];
@@ -50,7 +54,18 @@ const renamePokemon = (req, res) => {
         fibonacciSequence.push(fibonacciSequence[fibIndex - 1] + fibonacciSequence[fibIndex - 2]);
     }
 
+    const myPokemonIndex = myPokemon.findIndex((elem) => elem.id === id);
+    myPokemon[myPokemonIndex].nickname = `${newNickname}-${fibonacciSequence[fibIndex]}`;
+
     res.json({ renamedTo: `${newNickname}-${fibonacciSequence[fibIndex]}` });
 };
 
-module.exports = { catchPokemon, releasePokemon, renamePokemon };
+const getMyPokemon = (req, res) => {
+    try {
+        return data(true, 'success get all your pokemon', 200, myPokemon)
+    } catch (error) {
+        return error(false, 'Internal Server Error', 500);
+    }
+};
+
+module.exports = { catchPokemon, releasePokemon, renamePokemon, getMyPokemon };

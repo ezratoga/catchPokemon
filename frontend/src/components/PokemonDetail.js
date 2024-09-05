@@ -81,6 +81,8 @@ class PokemonDetail extends React.Component {
     
         // Create JSON payload from the state
         const payload = {
+            id: this?.props?.router?.params?.id ?? this?.pokemonId ?? '',
+            name: this.state.name ?? this.name ?? '',
             nickname: this.state.nickname
         };
     

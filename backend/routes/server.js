@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { catchPokemon, releasePokemon, renamePokemon } = require('../controllers/domain');
+const { catchPokemon, releasePokemon, renamePokemon, getMyPokemon } = require('../controllers/domain');
 
 router.post('/catch', (req, res) => {
     const getCatchPokemon = catchPokemon(req.body);
@@ -8,5 +8,9 @@ router.post('/catch', (req, res) => {
 });
 router.post('/release', releasePokemon);
 router.post('/rename', renamePokemon);
+router.get('/my-list', (req, res) => {
+    const myPokemon = getMyPokemon();
+    res.json(myPokemon);
+});
 
 module.exports = router;
